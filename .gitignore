@@ -25,5 +25,6 @@ build/
 sketch/
 
 # Local config
+cert.h
 secrets.h
 .env
