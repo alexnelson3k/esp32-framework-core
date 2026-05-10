@@ -1,0 +1,226 @@
+ESP32 Framework Core
+Overview
+ESP32 Framework Core is a modular, production-oriented embedded framework for building scalable IoT, automation, and device-control systems on ESP32 hardware.
+It provides a structured architecture for:
+* Parameter registry and persistent configuration
+* WiFi management
+* MQTT integration
+* Telnet access
+* REST/API services
+* Command processing
+* Logging and diagnostics
+* Health monitoring
+* Watchdog protection
+* Time synchronization (NTP + timezone)
+* Modular subsystem expansion
+The framework is designed for:
+* Industrial controllers
+* Smart home systems
+* Remote monitoring devices
+* Sensor hubs
+* Custom firmware platforms
+
+Key Features
+Core System
+* Centralized ParamManager for all configuration
+* ParamStorageManager with flash persistence
+* Registry checksum validation for schema mismatch detection
+* Automatic factory reset on registry structure changes
+* Event bus architecture
+* Modular startup and lifecycle management
+
+Connectivity
+WiFi Module
+* STA/AP support
+* Auto reconnect
+* Signal diagnostics
+* IP/network monitoring
+MQTT Module
+* Secure broker authentication
+* Parameter publishing by flags/tags
+* Health metrics publishing
+* Remote parameter control
+* Device status topics
+Telnet Module
+* Remote CLI management
+* Live diagnostics
+* Configuration access
+API Module
+* HTTP API endpoints
+* External integrations
+
+Diagnostics & Reliability
+Logger Module
+* Human-readable timestamped logs
+* Log levels:
+o DEBUG
+o INFO
+o WARNING
+o ERROR
+o CRITICAL
+* Serial logging
+* MQTT/syslog ready architecture
+* Dynamic profiling support
+TimeManager
+* NTP synchronization
+* Configurable timezone support
+* Periodic resync
+* Human-readable datetime for logs
+Watchdog Module
+* Runtime failure tracking
+* Stability monitoring
+* Automatic health reports
+
+Project Architecture
+Framework Core
+?
+??? Param System
+?   ??? Param_Types
+?   ??? Param_Config
+?   ??? ParamManager
+?   ??? ParamStorageManager
+?
+??? Core Services
+?   ??? ModuleManager
+?   ??? EventBus
+?   ??? TimeManager
+?   ??? LoggerModule
+?
+??? Connectivity Modules
+?   ??? WiFiManagerModule
+?   ??? MQTTModule
+?   ??? TelnetModule
+?   ??? APIModule
+?
+??? Safety
+?   ??? WatchdogModule
+?
+??? Interface
+    ??? CommandProcessor
+
+Command Interface
+Core Commands
+* help
+* status
+* factory_reset
+* reboot
+* list
+Parameter Commands
+* get <param>
+* set <param> <value>
+* info <param>
+* reset <param>
+Extended Diagnostics
+* Schema ID
+* Registry checksum
+* WiFi status
+* MQTT status
+* Heap health
+* Profiling state
+* Current timezone
+* NTP sync status
+
+Configuration Safety
+The framework protects against firmware/registry mismatches:
+On boot:
+* Validates schema ID
+* Validates registry checksum
+* Detects added/removed/reordered parameters
+* Automatically restores factory defaults if mismatch detected
+* Optional auto reboot after recovery
+This prevents corrupted settings after firmware upgrades.
+
+Logging Format
+[2026-05-10 14:32:18][INFO][SYSTEM] Framework boot started
+[2026-05-10 14:32:19][INFO][WiFi] Connected successfully
+[2026-05-10 14:32:22][WARNING][MQTT] Broker reconnect attempt failed
+
+Performance Profiling
+Optional runtime profiling tracks module loop duration:
+[PROFILE][WiFiManager] 4 ms
+[PROFILE][MQTTModule] 7 ms
+[PROFILE][Storage] 2 ms
+Useful for:
+* Bottleneck detection
+* Watchdog tuning
+* Optimization
+* Production diagnostics
+
+Build Requirements
+Hardware
+* ESP32 DevKit / ESP32-WROOM / compatible ESP32 boards
+Software
+* Arduino IDE or PlatformIO
+* ESP32 Board Package
+* PubSubClient
+* WiFi library
+* Preferences / NVS
+
+Installation
+Clone repository
+git clone https://github.com/YOUUSERNAME/esp32-framework-core.git
+Open project
+* Arduino IDE
+* Select ESP32 board
+* Configure BuildConfig.h
+* Upload firmware
+
+Development Workflow
+Recommended branches
+* main ? stable production
+* dev ? active integration
+* feature/* ? module development
+
+Roadmap
+Planned Features
+* Syslog integration
+* OTA updates
+* Web dashboard
+* TLS MQTT
+* Role-based access
+* Metrics dashboard
+* Advanced event automation
+* Multi-device orchestration
+
+Design Principles
+* Modular first
+* Fail safe
+* Production maintainable
+* Hardware efficient
+* Remote manageable
+* Upgrade resilient
+* Debuggable at scale
+
+License
+Specify your preferred license:
+* MIT
+* Apache 2.0
+* Proprietary
+
+Author
+Alex Nelson
+ESP32 Framework Core Project
+
+Contribution Guidelines
+Recommended process:
+1. Fork repository
+2. Create feature branch
+3. Commit changes
+4. Submit pull request
+5. Validate against hardware
+
+Support
+For architecture improvements, debugging, or module design:
+* GitHub Issues
+* Internal documentation
+* Developer branch reviews
+
+Summary
+ESP32 Framework Core is intended to be a long-term, extensible firmware platform rather than a single-purpose sketch.
+It emphasizes:
+* Stability
+* Scalability
+* Maintainability
+* Diagnostics
+* Remote operations
+This makes it suitable for serious embedded deployments and future commercial expansion.

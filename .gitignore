@@ -1,0 +1,29 @@
+# Arduino build
+*.ino.bootloader.bin
+*.ino.partitions.bin
+*.bin
+*.elf
+*.map
+
+# Temporary
+*.log
+*.tmp
+*.bak
+*.zip
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Arduino
+build/
+sketch/
+
+# Local config
+secrets.h
+.env
