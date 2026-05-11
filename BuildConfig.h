@@ -21,6 +21,7 @@
 #define ENABLE_TELNET_MODULE                  YES
 #define ENABLE_MQTT_MODULE                    YES
 #define ENABLE_API_MODULE                     YES
+#define ENABLE_SYSLOG_MODULE                  YES
 
 //#define ENABLE_DISPLAY_MODULE
 //#define ENABLE_SERIAL_MODULE

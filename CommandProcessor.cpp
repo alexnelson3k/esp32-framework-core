@@ -9,8 +9,13 @@
 #include "TelnetModule.h"
 #include "APIModule.h"
 #include "WatchdogModule.h"
+#include "BuildConfig.h"
 #include "Param_Types.h"
 #include "ParamStorageManager.h"
+
+#if ENABLE_SYSLOG_MODULE == YES
+#include "SyslogModule.h"
+#endif
 
 extern TimeManager timeManager;
 extern LoggerModule loggerModule;
@@ -19,6 +24,10 @@ extern MQTTModule mqttModule;
 extern TelnetModule telnetModule;
 extern APIModule apiModule;
 extern WatchdogModule watchdogModule;
+
+#if ENABLE_SYSLOG_MODULE == YES
+extern SyslogModule syslogModule;
+#endif
 
 CommandProcessor::CommandProcessor(ParamManager& pm, ParamStorageManager& sm)
     : BaseModule("CommandProcessor"),
@@ -209,6 +218,10 @@ bool CommandProcessor::handleSet(ParamIndex index, const String& value, Stream& 
             success = paramManager.setUInt(index, value.toInt());
             break;
 
+        case TYPE_ENUM:
+            success = paramManager.setEnum(index, value.toInt());
+            break;
+
         case TYPE_INT8:
         case TYPE_INT16:
         case TYPE_INT32:
@@ -384,6 +397,11 @@ void CommandProcessor::printExtendedStatus(Stream& output) {
     output.print("Telnet: ");
     output.println(telnetModule.hasClient() ? "Connected" : "Idle");
 
+#if ENABLE_SYSLOG_MODULE == YES
+    output.print("Syslog: ");
+    output.println(syslogModule.isReady() ? "Ready" : "Stopped");
+#endif
+
     output.println();
 
     output.print("Time: ");
@@ -391,7 +409,6 @@ void CommandProcessor::printExtendedStatus(Stream& output) {
 
     output.print("Timezone offset: ");
     output.println(paramManager.getInt(PARAM_TIMEZONE_OFFSET_MINUTES));
-    
 
     output.print("NTP Sync: ");
     output.println(timeManager.isTimeValid() ? "OK" : "NOT SYNCED");

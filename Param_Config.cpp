@@ -214,7 +214,7 @@ ConfigParam system_params[PARAM_COUNT] = {
         TYPE_UINT16,
         FLAG_SERIAL_ACCESS | FLAG_API_ACCESS | FLAG_SAVE_TO_FLASH,
         TAG_NETWORK,
-        {.uint16Param = {443, 1, 65535, 443 }}
+        {.uint16Param = {443, 1, 65535, 1, 443 }}
     },
 
     [PARAM_WATCHDOG_ENABLED] = {
@@ -359,6 +359,51 @@ ConfigParam system_params[PARAM_COUNT] = {
         FLAG_SERIAL_ACCESS | FLAG_API_ACCESS | FLAG_SAVE_TO_FLASH,
         TAG_DIAGNOSTICS | TAG_ADVANCED,
         {.uint32Param = { 5000, 100, 1000000, 100, 5000 }}
+    },
+
+    [PARAM_SYSLOG_ENABLED] = {
+        "syslog_enabled",
+        "Enable UDP syslog logging",
+        TYPE_BOOL,
+        FLAG_SERIAL_ACCESS | FLAG_API_ACCESS | FLAG_SAVE_TO_FLASH,
+        TAG_SYSTEM | TAG_NETWORK | TAG_DIAGNOSTICS,
+        {.boolParam = { false, false }}
+    },
+
+    [PARAM_SYSLOG_SERVER] = {
+        "syslog_server",
+        "Syslog server hostname or IP address",
+        TYPE_STRING,
+        FLAG_SERIAL_ACCESS | FLAG_API_ACCESS | FLAG_SAVE_TO_FLASH,
+        TAG_SYSTEM | TAG_NETWORK | TAG_DIAGNOSTICS,
+        {.stringParam = { "", 128, "" }}
+    },
+
+    [PARAM_SYSLOG_PORT] = {
+        "syslog_port",
+        "Syslog UDP server port",
+        TYPE_UINT16,
+        FLAG_SERIAL_ACCESS | FLAG_API_ACCESS | FLAG_SAVE_TO_FLASH,
+        TAG_SYSTEM | TAG_NETWORK | TAG_DIAGNOSTICS,
+        {.uint16Param = { 514, 1, 65535, 1, 514 }}
+    },
+
+    [PARAM_SYSLOG_FACILITY] = {
+        "syslog_facility",
+        "Syslog facility code",
+        TYPE_UINT8,
+        FLAG_SERIAL_ACCESS | FLAG_API_ACCESS | FLAG_SAVE_TO_FLASH,
+        TAG_SYSTEM | TAG_DIAGNOSTICS | TAG_ADVANCED,
+        {.uint8Param = { 16, 0, 23, 1, 16 }}
+    },
+
+    [PARAM_SYSLOG_MIN_LEVEL] = {
+        "syslog_min_level",
+        "Maximum log verbosity sent to syslog",
+        TYPE_ENUM,
+        FLAG_SERIAL_ACCESS | FLAG_API_ACCESS | FLAG_SAVE_TO_FLASH,
+        TAG_SYSTEM | TAG_DIAGNOSTICS,
+        {.enumParam = { 2, 2, log_level_options, 4 }}
     },
 
     [PARAM_TEMP_SETPOINT] = {

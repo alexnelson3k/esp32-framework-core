@@ -31,6 +31,10 @@
 #include "APIModule.h"
 #endif
 
+#if ENABLE_SYSLOG_MODULE == YES
+#include "SyslogModule.h"
+#endif
+
 // ============================================================
 // Global Core Objects
 // ============================================================
@@ -65,6 +69,10 @@ MQTTModule mqttModule(paramManager);
 APIModule apiModule(paramManager, storageManager);
 #endif
 
+#if ENABLE_SYSLOG_MODULE == YES
+SyslogModule syslogModule(paramManager);
+#endif
+
 
 
 // ============================================================
@@ -96,6 +104,10 @@ void registerModules() {
 
 #if ENABLE_API_MODULE == YES
     moduleManager.registerModule(&apiModule);
+#endif
+
+#if ENABLE_SYSLOG_MODULE == YES
+    moduleManager.registerModule(&syslogModule);
 #endif
 
 }

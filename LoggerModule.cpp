@@ -5,6 +5,12 @@
 #include "LoggerModule.h"
 #include <stdarg.h>
 
+#include "BuildConfig.h"
+
+#if ENABLE_SYSLOG_MODULE == YES
+#include "SyslogModule.h"
+#endif
+
 LoggerModule* globalLogger = nullptr;
 
 // ============================================================
@@ -121,10 +127,15 @@ void LoggerModule::log(LogLevel level, const char* module, const String& message
         Serial.println(output);
     }
 
+#if ENABLE_SYSLOG_MODULE == YES
+    if (globalSyslog) {
+        globalSyslog->send(level, module, message);
+    }
+#endif
+
     // Future:
     // Telnet
     // MQTT
-    // Syslog
     // API buffer
 }
 
