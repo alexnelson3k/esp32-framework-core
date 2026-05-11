@@ -10,12 +10,12 @@ SyslogModule::SyslogModule(ParamManager& pm)
 
 bool SyslogModule::init() {
     initialized = true;
-    enabled = paramManager.getBool(PARAM_SYSLOG_ENABLED);
+    enabled = paramManager.getBool(PARAM_LOG_SYSLOG_ENABLED);
     return true;
 }
 
 void SyslogModule::start() {
-    enabled = paramManager.getBool(PARAM_SYSLOG_ENABLED);
+    enabled = paramManager.getBool(PARAM_LOG_SYSLOG_ENABLED);
 }
 
 void SyslogModule::stop() {
@@ -24,7 +24,7 @@ void SyslogModule::stop() {
 }
 
 void SyslogModule::loop() {
-    enabled = paramManager.getBool(PARAM_SYSLOG_ENABLED);
+    enabled = paramManager.getBool(PARAM_LOG_SYSLOG_ENABLED);
 }
 
 bool SyslogModule::isReady() {
