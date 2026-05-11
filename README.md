@@ -158,7 +158,7 @@ Software
 
 Installation
 Clone repository
-git clone https://github.com/YOUUSERNAME/esp32-framework-core.git
+git clone https://github.com/alexnelson3k/esp32-framework-core.git
 Open project
 * Arduino IDE
 * Select ESP32 board
