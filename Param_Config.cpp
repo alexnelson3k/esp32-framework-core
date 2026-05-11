@@ -1,6 +1,7 @@
 //Param_Config.cpp
 
 #include "Param_Types.h"
+#include "secrets.h"
 
 // ============================================================
 // Enum Definitions
@@ -43,7 +44,7 @@ ConfigParam system_params[PARAM_COUNT] = {
         TYPE_STRING,
         FLAG_SERIAL_ACCESS | FLAG_API_ACCESS | FLAG_SAVE_TO_FLASH,
         TAG_NETWORK | TAG_SECURITY,
-        {.stringParam = {"MyWiFi", 64, "MyWiFi"}}
+        {.stringParam = {DEFAULT_SSID, 64, DEFAULT_SSID}}
     },
 
     [PARAM_WIFI_PASSWORD] = {
@@ -52,7 +53,7 @@ ConfigParam system_params[PARAM_COUNT] = {
         TYPE_PASSWORD,
         FLAG_SERIAL_ACCESS | FLAG_API_ACCESS | FLAG_SAVE_TO_FLASH | FLAG_SECURED,
         TAG_NETWORK | TAG_SECURITY,
-        {.stringParam = {"password123", 64, "password123"}}
+        {.stringParam = {DEFAULT_WIFI_PASSWORD, 64, DEFAULT_WIFI_PASSWORD}}
     },
     
     [PARAM_WIFI_TIMEOUT] = {
@@ -115,7 +116,7 @@ ConfigParam system_params[PARAM_COUNT] = {
         TYPE_STRING,
         FLAG_SERIAL_ACCESS | FLAG_API_ACCESS | FLAG_SAVE_TO_FLASH,
         TAG_NETWORK,
-        {.stringParam = {"broker.local", 128, "broker.local" }}
+        {.stringParam = {DEFAULT_MQTT_SERVER, 128, DEFAULT_MQTT_SERVER }}
     },
 
     [PARAM_MQTT_PORT] = {
@@ -133,7 +134,7 @@ ConfigParam system_params[PARAM_COUNT] = {
         TYPE_STRING,
         FLAG_SERIAL_ACCESS | FLAG_API_ACCESS | FLAG_SAVE_TO_FLASH,
         TAG_SECURITY,
-        {.stringParam = { "", 128, "" }}
+        {.stringParam = { DEFAULT_MQTT_USERNAME, 128, DEFAULT_MQTT_USERNAME }}
     },
 
     [PARAM_MQTT_PASSWORD] = {
@@ -142,7 +143,7 @@ ConfigParam system_params[PARAM_COUNT] = {
         TYPE_PASSWORD,
         FLAG_SERIAL_ACCESS | FLAG_API_ACCESS | FLAG_SAVE_TO_FLASH | FLAG_SECURED,
         TAG_SECURITY,
-        {.stringParam = { "", 128, "" }}
+        {.stringParam = { DEFAULT_MQTT_PASSWORD, 128, DEFAULT_MQTT_PASSWORD }}
     },
 
     [PARAM_MQTT_CONNECT_TIMEOUT_MS] = {
@@ -205,7 +206,7 @@ ConfigParam system_params[PARAM_COUNT] = {
         TYPE_STRING,
         FLAG_SERIAL_ACCESS | FLAG_API_ACCESS | FLAG_SAVE_TO_FLASH,
         TAG_NETWORK,
-        {.stringParam = {"ChangeMe123456", 64, "" }}
+        {.stringParam = {DEFAULT_API_TOKEN, 64, DEFAULT_API_TOKEN }}
     },
 
     [PARAM_API_PORT] = {
