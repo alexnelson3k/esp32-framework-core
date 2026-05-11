@@ -390,7 +390,8 @@ void CommandProcessor::printExtendedStatus(Stream& output) {
     output.println(timeManager.getFormattedTime());
 
     output.print("Timezone offset: ");
-    output.println(paramManager.getString(PARAM_TIMEZONE_OFFSET_MINUTES));
+    output.println(paramManager.getInt(PARAM_TIMEZONE_OFFSET_MINUTES));
+    
 
     output.print("NTP Sync: ");
     output.println(timeManager.isTimeValid() ? "OK" : "NOT SYNCED");

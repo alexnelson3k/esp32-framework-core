@@ -214,7 +214,7 @@ ConfigParam system_params[PARAM_COUNT] = {
         TYPE_UINT16,
         FLAG_SERIAL_ACCESS | FLAG_API_ACCESS | FLAG_SAVE_TO_FLASH,
         TAG_NETWORK,
-        {.uint16Param = {443, 443, 1, 65535 }}
+        {.uint16Param = {443, 1, 65535, 443 }}
     },
 
     [PARAM_WATCHDOG_ENABLED] = {

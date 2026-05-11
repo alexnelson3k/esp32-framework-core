@@ -17,7 +17,7 @@ public:
     void start() override;
     void stop() override;
     void loop() override;
-    bool hasClient() const;
+    bool hasClient();
 
 private:
     ParamManager& paramManager;

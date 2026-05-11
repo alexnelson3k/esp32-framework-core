@@ -118,6 +118,6 @@ void TelnetModule::loop() {
     }
 }
 
-bool TelnetModule::hasClient() const {
+bool TelnetModule::hasClient() {
     return telnetClient && telnetClient.connected();
 }
