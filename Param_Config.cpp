@@ -361,9 +361,9 @@ ConfigParam system_params[PARAM_COUNT] = {
         {.uint32Param = { 5000, 100, 1000000, 100, 5000 }}
     },
 
-    [PARAM_SYSLOG_ENABLED] = {
-        "syslog_enabled",
-        "Enable UDP syslog logging",
+    [PARAM_LOG_SYSLOG_ENABLED] = {
+        "log_syslog_enabled",
+        "Enable syslog logging",
         TYPE_BOOL,
         FLAG_SERIAL_ACCESS | FLAG_API_ACCESS | FLAG_SAVE_TO_FLASH,
         TAG_SYSTEM | TAG_NETWORK | TAG_DIAGNOSTICS,
