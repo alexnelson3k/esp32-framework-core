@@ -6,6 +6,9 @@
 
 TimeManager* globalTimeManager = nullptr;
 
+static const unsigned long INITIAL_NTP_RETRY_INTERVAL_MS = 30000;
+static const uint32_t NTP_SYNC_TIMEOUT_MS = 2000;
+
 // ============================================================
 // Constructor
 // ============================================================
@@ -40,6 +43,7 @@ bool TimeManager::init() {
 
     if (WiFi.isConnected()) {
         syncTimeInternal();
+        lastSync = millis();
     }
 
     return true;
@@ -65,7 +69,10 @@ void TimeManager::loop() {
 
     if (!enabled) return;
 
-    if (!paramManager.getBool(PARAM_NTP_ENABLED)) return;
+    if (!paramManager.getBool(PARAM_NTP_ENABLED)) {
+        timeValid = false;
+        return;
+    }
 
     syncIntervalMs =
         paramManager.getUInt(PARAM_NTP_RESYNC_INTERVAL_MS);
@@ -73,6 +80,14 @@ void TimeManager::loop() {
     if (!WiFi.isConnected()) return;
 
     unsigned long now = millis();
+
+    if (!timeValid) {
+        if (lastSync == 0 || now - lastSync >= INITIAL_NTP_RETRY_INTERVAL_MS) {
+            syncTimeInternal();
+            lastSync = now;
+        }
+        return;
+    }
 
     if (now - lastSync >= syncIntervalMs) {
         syncTimeInternal();
@@ -109,7 +124,7 @@ void TimeManager::syncTimeInternal() {
 
     struct tm timeinfo;
 
-    if (getLocalTime(&timeinfo, 10000)) {
+    if (getLocalTime(&timeinfo, NTP_SYNC_TIMEOUT_MS)) {
         timeValid = true;
     } else {
         timeValid = false;
