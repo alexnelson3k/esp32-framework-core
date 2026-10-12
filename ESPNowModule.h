@@ -35,7 +35,7 @@ private:
     void sendHeartbeat();
 
     static ESPNowModule* instance;
-    static void onSend(const uint8_t* macAddr, esp_now_send_status_t status);
+    static void onSend(const wifi_tx_info_t* txInfo, esp_now_send_status_t status);
     static void onReceive(const esp_now_recv_info_t* info, const uint8_t* data, int len);
 
 public:
