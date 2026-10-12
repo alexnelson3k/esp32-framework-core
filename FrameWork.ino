@@ -15,6 +15,10 @@
 #include "WiFiManagerModule.h"
 #endif
 
+#if ENABLE_ESPNOW_MODULE == YES
+#include "ESPNowModule.h"
+#endif
+
 #if ENABLE_COMMANDPROCESSOR_MODULE == YES
 #include "CommandProcessor.h"
 #endif
@@ -53,6 +57,10 @@ WatchdogModule watchdogModule(paramManager);
 WiFiManagerModule wifiManager(paramManager);
 #endif
 
+#if ENABLE_ESPNOW_MODULE == YES
+ESPNowModule espNowModule(paramManager);
+#endif
+
 #if ENABLE_COMMANDPROCESSOR_MODULE == YES
 CommandProcessor commandProcessor(paramManager, storageManager);
 #endif
@@ -88,6 +96,10 @@ void registerModules() {
 #if ENABLE_WIFI_MODULE == YES
     moduleManager.registerModule(&wifiManager);
     loggerModule.log(LOG_INFO, "SYSTEM", "Registering WiFi module");
+#endif
+
+#if ENABLE_ESPNOW_MODULE == YES
+    moduleManager.registerModule(&espNowModule);
 #endif
 
 #if ENABLE_COMMANDPROCESSOR_MODULE == YES
