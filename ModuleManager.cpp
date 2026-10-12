@@ -1,4 +1,5 @@
 #include "ModuleManager.h"
+#include "LoggerModule.h"
 
 ModuleManager::ModuleManager() {}
 
@@ -59,7 +60,12 @@ void ModuleManager::stopModules() {
 void ModuleManager::loopModules() {
     for (BaseModule* module : modules) {
         if (module->isEnabled()) {
+            LoggerModule* logger = globalLogger;
+            unsigned long start = logger ? logger->profileStart() : 0;
             module->loop();
+            if (logger) {
+                logger->profileEnd(module->getName(), start);
+            }
         }
     }
 }
