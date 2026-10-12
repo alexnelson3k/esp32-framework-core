@@ -17,6 +17,7 @@
 // ============================================================
 #define ENABLE_WATCHDOG_MODULE                YES
 #define ENABLE_WIFI_MODULE                    YES
+#define ENABLE_ESPNOW_MODULE                  YES
 #define ENABLE_COMMANDPROCESSOR_MODULE        YES
 #define ENABLE_TELNET_MODULE                  YES
 #define ENABLE_MQTT_MODULE                    YES
