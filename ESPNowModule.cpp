@@ -1,6 +1,7 @@
 #include "ESPNowModule.h"
 
 #include <esp_wifi.h>
+#include <stdio.h>
 
 static const uint32_t ESPNOW_PACKET_MAGIC = 0x4553504E; // ESPN
 static const uint8_t ESPNOW_PACKET_VERSION = 1;
@@ -28,15 +29,18 @@ bool ESPNowModule::init() {
         return true;
     }
 
-    WiFi.mode(WIFI_STA);
+    if (WiFi.getMode() == WIFI_OFF) {
+        WiFi.mode(WIFI_STA);
+    }
 
     if (!configureRadioChannel()) {
-        return false;
+        espNowReady = false;
+        return true;
     }
 
     if (esp_now_init() != ESP_OK) {
         espNowReady = false;
-        return false;
+        return true;
     }
 
     espNowReady = true;
