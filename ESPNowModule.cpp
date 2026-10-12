@@ -175,7 +175,7 @@ void ESPNowModule::sendHeartbeat() {
     }
 }
 
-void ESPNowModule::onSend(const uint8_t*, esp_now_send_status_t status) {
+void ESPNowModule::onSend(const wifi_tx_info_t*, esp_now_send_status_t status) {
     if (!instance) return;
 
     if (status == ESP_NOW_SEND_SUCCESS) {
