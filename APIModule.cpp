@@ -219,7 +219,7 @@ esp_err_t APIModule::processSet(httpd_req_t* req) {
         return ESP_OK;
     }
 
-    char buffer[2048];
+    char buffer[2049];
     int received = httpd_req_recv(req, buffer, req->content_len);
 
     if (received <= 0) {
