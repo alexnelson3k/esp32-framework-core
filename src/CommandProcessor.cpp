@@ -138,7 +138,7 @@ bool CommandProcessor::processParamCommand(const String& cmd, const String& para
     if (paramName.length() == 0) return false;
 
     ParamIndex index = findParamByName(paramName);
-    if (index == PARAM_COUNT) {
+    if (index == system_param_count) {
         output.println("Error: Parameter not found.");
         return true;
     }
@@ -165,12 +165,12 @@ bool CommandProcessor::processParamCommand(const String& cmd, const String& para
 }
 
 ParamIndex CommandProcessor::findParamByName(const String& name) {
-    for (uint16_t i = 0; i < PARAM_COUNT; i++) {
+    for (uint16_t i = 0; i < system_param_count; i++) {
         if (name.equalsIgnoreCase(system_params[i].name)) {
             return static_cast<ParamIndex>(i);
         }
     }
-    return PARAM_COUNT;
+    return system_param_count;
 }
 
 bool CommandProcessor::isParamAccessible(const ConfigParam& param) {
@@ -310,7 +310,7 @@ void CommandProcessor::showStatus(Stream& output) {
 void CommandProcessor::showAllParameters(Stream& output) {
     output.println("=== PARAMETERS ===");
 
-    for (uint16_t i = 0; i < PARAM_COUNT; i++) {
+    for (uint16_t i = 0; i < system_param_count; i++) {
         ConfigParam& param = system_params[i];
 
         if (!isParamAccessible(param)) continue;
@@ -360,7 +360,7 @@ void CommandProcessor::printExtendedStatus(Stream& output) {
     output.println(storageManager.calculateRegistryChecksum(), HEX);
 
     output.print("Param Count: ");
-    output.println(PARAM_COUNT);
+    output.println(system_param_count);
 
     output.println();
 

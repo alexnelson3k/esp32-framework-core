@@ -1,146 +1,48 @@
-#include "BuildConfig.h"
-#include "Functions.h"
-#include "ParamStorageManager.h"
-#include "ParamManager.h"
-#include "ModuleManager.h"
-#include "EventBus.h"
-#include "TimeManager.h"
-#include "LoggerModule.h"
+#include "src/ESP32Framework.h"
 
-#if ENABLE_WATCHDOG_MODULE == YES
-#include "WatchdogModule.h"
+#if __has_include("secrets.h")
+#include "secrets.h"
+#endif
+#if __has_include("cert.h")
+#include "cert.h"
+#define FRAMEWORK_HAS_CERTIFICATE
 #endif
 
-#if ENABLE_WIFI_MODULE == YES
-#include "WiFiManagerModule.h"
-#endif
-
-#if ENABLE_ESPNOW_MODULE == YES
-#include "ESPNowModule.h"
-#endif
-
-#if ENABLE_COMMANDPROCESSOR_MODULE == YES
-#include "CommandProcessor.h"
-#endif
-
-#if ENABLE_TELNET_MODULE == YES
-#include "TelnetModule.h"
-#endif
-
-#if ENABLE_MQTT_MODULE == YES
-#include "MQTTModule.h"
-#endif
-
-#if ENABLE_API_MODULE == YES
-#include "APIModule.h"
-#endif
-
-#if ENABLE_SYSLOG_MODULE == YES
-#include "SyslogModule.h"
-#endif
-
-// ============================================================
-// Global Core Objects
-// ============================================================
-ParamStorageManager storageManager;
-ParamManager paramManager(storageManager);
-TimeManager timeManager(paramManager);
-LoggerModule loggerModule(paramManager, timeManager);
-ModuleManager moduleManager;
-EventBus eventBus;
-
-#if ENABLE_WATCHDOG_MODULE == YES
-WatchdogModule watchdogModule(paramManager);
-#endif
-
-#if ENABLE_WIFI_MODULE  == YES
-WiFiManagerModule wifiManager(paramManager);
-#endif
-
-#if ENABLE_ESPNOW_MODULE == YES
-ESPNowModule espNowModule(paramManager);
-#endif
-
-#if ENABLE_COMMANDPROCESSOR_MODULE == YES
-CommandProcessor commandProcessor(paramManager, storageManager);
-#endif
-
-#if ENABLE_TELNET_MODULE == YES
-TelnetModule telnetModule(paramManager, commandProcessor);
-#endif
-
-#if ENABLE_MQTT_MODULE == YES
-MQTTModule mqttModule(paramManager);
-#endif
-
-#if ENABLE_API_MODULE == YES
-APIModule apiModule(paramManager, storageManager);
-#endif
-
-#if ENABLE_SYSLOG_MODULE == YES
-SyslogModule syslogModule(paramManager);
-#endif
-
-
-
-// ============================================================
-// Module Registration
-// ============================================================
-
-void registerModules() {
-
-#if ENABLE_WATCHDOG_MODULE == YES
-    moduleManager.registerModule(&watchdogModule);
-#endif
-
-#if ENABLE_WIFI_MODULE == YES
-    moduleManager.registerModule(&wifiManager);
-    loggerModule.log(LOG_INFO, "SYSTEM", "Registering WiFi module");
-#endif
-
-#if ENABLE_ESPNOW_MODULE == YES
-    moduleManager.registerModule(&espNowModule);
-#endif
-
-#if ENABLE_COMMANDPROCESSOR_MODULE == YES
-    moduleManager.registerModule(&commandProcessor);
-#endif
-
-#if ENABLE_TELNET_MODULE == YES
-    moduleManager.registerModule(&telnetModule);
-#endif
-
-#if ENABLE_MQTT_MODULE == YES
-    moduleManager.registerModule(&mqttModule);
-#endif
-
-#if ENABLE_API_MODULE == YES
-    moduleManager.registerModule(&apiModule);
-#endif
-
-#if ENABLE_SYSLOG_MODULE == YES
-    moduleManager.registerModule(&syslogModule);
-#endif
-
+static void stringDefault(ParamIndex index, const char* value) {
+    ConfigParam& param = system_params[index];
+    param.stringParam.defaultValue = value;
+    strncpy(param.stringParam.value, value, param.stringParam.maxLength - 1);
+    param.stringParam.value[param.stringParam.maxLength - 1] = '\0';
 }
-
-// ============================================================
-// Arduino Setup
-// ============================================================
 
 void setup() {
-    initializeSystem();
+#ifdef DEFAULT_SSID
+    stringDefault(PARAM_WIFI_SSID, DEFAULT_SSID);
+#endif
+#ifdef DEFAULT_WIFI_PASSWORD
+    stringDefault(PARAM_WIFI_PASSWORD, DEFAULT_WIFI_PASSWORD);
+#endif
+#ifdef DEFAULT_MQTT_SERVER
+    stringDefault(PARAM_MQTT_SERVER, DEFAULT_MQTT_SERVER);
+#endif
+#ifdef DEFAULT_MQTT_USERNAME
+    stringDefault(PARAM_MQTT_USERNAME, DEFAULT_MQTT_USERNAME);
+#endif
+#ifdef DEFAULT_MQTT_PASSWORD
+    stringDefault(PARAM_MQTT_PASSWORD, DEFAULT_MQTT_PASSWORD);
+#endif
+#ifdef DEFAULT_API_TOKEN
+    stringDefault(PARAM_API_TOKEN, DEFAULT_API_TOKEN);
+#endif
+#ifdef FRAMEWORK_HAS_CERTIFICATE
+    frameworkConfigureTLS(server_cert, server_key);
+#else
+    system_params[PARAM_API_ENABLED].boolParam.value = false;
+    system_params[PARAM_API_ENABLED].boolParam.defaultValue = false;
+#endif
+    frameworkBegin();
 }
 
-// ============================================================
-// Arduino Main Loop
-// ============================================================
-
 void loop() {
-    loggerModule.loop();
-    timeManager.loop();
-
-    unsigned long start = loggerModule.profileStart();
-    processCoreTasks();
-    loggerModule.profileEnd("CoreTasks", start);
+    frameworkLoop();
 }

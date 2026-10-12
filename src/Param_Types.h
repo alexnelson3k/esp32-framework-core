@@ -186,7 +186,9 @@ struct ConfigParam {
 // Parameter Indexes (Template Examples)
 // ============================================================
 
-enum ParamIndex {
+using ParamIndex = uint16_t;
+
+enum CoreParamIndex {
     PARAM_DEVICE_NAME,
     PARAM_WIFI_ENABLED,
     PARAM_WIFI_SSID,
@@ -243,7 +245,12 @@ enum ParamIndex {
 // Global Param Table
 // ============================================================
 
-extern ConfigParam system_params[PARAM_COUNT];
+extern ConfigParam* system_params;
+extern uint16_t system_param_count;
+
+// Project parameters must be registered before storage and modules start.
+bool registerProjectParameters(const ConfigParam* parameters, size_t count);
+void sealParameterRegistry();
 
 // ============================================================
 // Helpers

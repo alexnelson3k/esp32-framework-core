@@ -6,7 +6,7 @@
 #include "Param_Types.h"
 #include <CRC32.h>
 
-extern ConfigParam system_params[PARAM_COUNT];
+extern ConfigParam* system_params;
 
 // ============================================================
 // Constructor
@@ -15,9 +15,7 @@ extern ConfigParam system_params[PARAM_COUNT];
 ParamStorageManager::ParamStorageManager()
     : lastSaveTime(0) {
 
-    for (uint16_t i = 0; i < PARAM_COUNT; i++) {
-        dirtyFlags[i] = false;
-    }
+
 }
 
 // ============================================================
@@ -27,7 +25,7 @@ ParamStorageManager::ParamStorageManager()
 uint32_t ParamStorageManager::calculateRegistryChecksum() {
     CRC32 crc;
 
-    for (uint16_t i = 0; i < PARAM_COUNT; i++) {
+    for (uint16_t i = 0; i < system_param_count; i++) {
         ConfigParam& p = system_params[i];
 
         crc.update((const uint8_t*)p.name, strlen(p.name));
@@ -94,7 +92,7 @@ void ParamStorageManager::saveStorageHeader() {
 // ============================================================
 
 void ParamStorageManager::resetToFactoryDefaults() {
-    for (uint16_t i = 0; i < PARAM_COUNT; i++) {
+    for (uint16_t i = 0; i < system_param_count; i++) {
         ConfigParam& p = system_params[i];
 
         switch (p.type) {
@@ -167,6 +165,8 @@ void ParamStorageManager::resetToFactoryDefaults() {
 // ============================================================
 
 bool ParamStorageManager::init() {
+    sealParameterRegistry();
+    dirtyFlags.resize(system_param_count, 0);
     if (!preferences.begin("params", false)) {
         return false;
     }
@@ -196,7 +196,7 @@ bool ParamStorageManager::init() {
 // ============================================================
 
 void ParamStorageManager::scheduleSave(ParamIndex index) {
-    if (index < PARAM_COUNT) {
+    if (index < system_param_count) {
         dirtyFlags[index] = true;
     }
 }
@@ -214,7 +214,7 @@ void ParamStorageManager::process() {
 
     lastSaveTime = now;
 
-    for (uint16_t i = 0; i < PARAM_COUNT; i++) {
+    for (uint16_t i = 0; i < system_param_count; i++) {
         if (dirtyFlags[i]) {
             saveParam((ParamIndex)i);
             dirtyFlags[i] = false;
@@ -227,7 +227,7 @@ void ParamStorageManager::process() {
 // ============================================================
 
 bool ParamStorageManager::saveParam(ParamIndex index) {
-    if (index >= PARAM_COUNT) return false;
+    if (index >= system_param_count) return false;
 
     ConfigParam& p = system_params[index];
     String key = String(index);
@@ -298,7 +298,7 @@ bool ParamStorageManager::saveParam(ParamIndex index) {
 // ============================================================
 
 bool ParamStorageManager::loadParam(ParamIndex index) {
-    if (index >= PARAM_COUNT) return false;
+    if (index >= system_param_count) return false;
 
     ConfigParam& p = system_params[index];
     String key = String(index);
@@ -381,7 +381,7 @@ bool ParamStorageManager::loadParam(ParamIndex index) {
 // ============================================================
 
 void ParamStorageManager::saveAll() {
-    for (uint16_t i = 0; i < PARAM_COUNT; i++) {
+    for (uint16_t i = 0; i < system_param_count; i++) {
         saveParam((ParamIndex)i);
     }
 
@@ -389,7 +389,7 @@ void ParamStorageManager::saveAll() {
 }
 
 void ParamStorageManager::loadAll() {
-    for (uint16_t i = 0; i < PARAM_COUNT; i++) {
+    for (uint16_t i = 0; i < system_param_count; i++) {
         loadParam((ParamIndex)i);
     }
 }

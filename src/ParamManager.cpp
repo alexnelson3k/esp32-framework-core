@@ -20,7 +20,7 @@ bool ParamManager::hasTag(ParamIndex index, uint32_t tag) {
 std::vector<ParamIndex> ParamManager::getParamsByTag(uint32_t tag) {
     std::vector<ParamIndex> results;
 
-    for (uint16_t i = 0; i < PARAM_COUNT; i++) {
+    for (uint16_t i = 0; i < system_param_count; i++) {
         if (hasTag(static_cast<ParamIndex>(i), tag)) {
             results.push_back(static_cast<ParamIndex>(i));
         }

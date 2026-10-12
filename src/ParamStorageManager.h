@@ -7,6 +7,7 @@
 
 #include <Arduino.h>
 #include <Preferences.h>
+#include <vector>
 #include "Param_Types.h"
 
 #define PARAM_STORAGE_MAGIC 0xDEADBEEF
@@ -23,7 +24,7 @@ class ParamStorageManager {
 private:
     Preferences preferences;
 
-    bool dirtyFlags[PARAM_COUNT];
+    std::vector<uint8_t> dirtyFlags;
     unsigned long lastSaveTime;
 
     bool validateStorageHeader();

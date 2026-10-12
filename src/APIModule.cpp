@@ -1,9 +1,8 @@
 // APIModule.cpp
 
 #include "APIModule.h"
-#include "cert.h"
 
-extern ConfigParam system_params[PARAM_COUNT];
+extern ConfigParam* system_params;
 
 APIModule::APIModule(ParamManager& pm, ParamStorageManager& sm)
     : BaseModule("API"),
@@ -66,15 +65,16 @@ void APIModule::loop() {
 }
 
 bool APIModule::startServer() {
+    if (!certificate || !privateKey) return false;
     httpd_ssl_config_t conf = HTTPD_SSL_CONFIG_DEFAULT();
 
     conf.httpd.server_port = paramManager.getUInt(PARAM_API_PORT);
 
-    conf.servercert = (const uint8_t*)server_cert;
-    conf.servercert_len = strlen(server_cert) + 1;
+    conf.servercert = (const uint8_t*)certificate;
+    conf.servercert_len = strlen(certificate) + 1;
 
-    conf.prvtkey_pem = (const uint8_t*)server_key;
-    conf.prvtkey_len = strlen(server_key) + 1;
+    conf.prvtkey_pem = (const uint8_t*)privateKey;
+    conf.prvtkey_len = strlen(privateKey) + 1;
 
     conf.httpd.max_open_sockets = 1;
     conf.httpd.recv_wait_timeout = 10;
@@ -131,7 +131,7 @@ esp_err_t APIModule::processConfig(httpd_req_t* req) {
 
     cJSON* root = cJSON_CreateObject();
 
-    for (int i = 0; i < PARAM_COUNT; i++) {
+    for (int i = 0; i < system_param_count; i++) {
         ConfigParam& p = system_params[i];
 
         if (!(p.flags & FLAG_API_ACCESS)) continue;
@@ -243,16 +243,16 @@ esp_err_t APIModule::processSet(httpd_req_t* req) {
 
     cJSON_ArrayForEach(item, root) {
 
-        ParamIndex foundIndex = PARAM_COUNT;
+        ParamIndex foundIndex = system_param_count;
 
-        for (int i = 0; i < PARAM_COUNT; i++) {
+        for (int i = 0; i < system_param_count; i++) {
             if (strcmp(system_params[i].name, item->string) == 0) {
                 foundIndex = (ParamIndex)i;
                 break;
             }
         }
 
-        if (foundIndex == PARAM_COUNT) {
+        if (foundIndex == system_param_count) {
             failed++;
             continue;
         }

@@ -20,6 +20,8 @@ private:
 
     httpd_handle_t server;
     bool running;
+    const char* certificate = nullptr;
+    const char* privateKey = nullptr;
 
     httpd_uri_t config_uri;
     httpd_uri_t set_uri;
@@ -47,6 +49,11 @@ private:
 
 public:
     APIModule(ParamManager& pm, ParamStorageManager& sm);
+
+    void configureTLS(const char* cert, const char* key) {
+        certificate = cert;
+        privateKey = key;
+    }
 
     bool isRunning() const { return running; }
 

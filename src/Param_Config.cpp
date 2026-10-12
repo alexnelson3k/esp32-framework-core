@@ -2,7 +2,13 @@
 
 #include "Param_Types.h"
 #include "Param_Builders.h"
-#include "secrets.h"
+// Applications supply credentials as local defaults before frameworkBegin().
+static constexpr const char* DEFAULT_SSID = "";
+static constexpr const char* DEFAULT_WIFI_PASSWORD = "";
+static constexpr const char* DEFAULT_MQTT_SERVER = "";
+static constexpr const char* DEFAULT_MQTT_USERNAME = "";
+static constexpr const char* DEFAULT_MQTT_PASSWORD = "";
+static constexpr const char* DEFAULT_API_TOKEN = "";
 
 // ============================================================
 // Enum Definitions
@@ -19,7 +25,7 @@ constexpr EnumOption log_level_options[] = {
 // Global Parameter Table
 // ============================================================
 
-ConfigParam system_params[PARAM_COUNT] = {
+static ConfigParam core_params[PARAM_COUNT] = {
 
     [PARAM_DEVICE_NAME] = stringParam("device_name")
         .description("Device Name")
@@ -316,6 +322,9 @@ ConfigParam system_params[PARAM_COUNT] = {
         .tags(TAG_SENSOR).build()
 
 };
+
+ConfigParam* system_params = core_params;
+uint16_t system_param_count = PARAM_COUNT;
 
 String getParamDisplayValue(ParamIndex index) {
     ConfigParam& param = system_params[index];

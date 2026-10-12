@@ -3,7 +3,7 @@
 #include "MQTTModule.h"
 #include "Param_Types.h"
 
-extern ConfigParam system_params[PARAM_COUNT];
+extern ConfigParam* system_params;
 
 MQTTModule* globalMQTTModule = nullptr;
 
@@ -168,7 +168,7 @@ void MQTTModule::publishParam(ParamIndex index) {
 }
 
 void MQTTModule::publishByFlag(uint16_t flag) {
-    for (uint16_t i = 0; i < PARAM_COUNT; i++) {
+    for (uint16_t i = 0; i < system_param_count; i++) {
         if (system_params[i].flags & flag) {
             publishParam((ParamIndex)i);
         }
@@ -176,7 +176,7 @@ void MQTTModule::publishByFlag(uint16_t flag) {
 }
 
 void MQTTModule::publishByTag(uint32_t tag) {
-    for (uint16_t i = 0; i < PARAM_COUNT; i++) {
+    for (uint16_t i = 0; i < system_param_count; i++) {
         if (system_params[i].tags & tag) {
             publishParam((ParamIndex)i);
         }
@@ -250,7 +250,7 @@ void MQTTModule::publishEvent(
 // ============================================================
 
 void MQTTModule::subscribeTopics() {
-    for (uint16_t i = 0; i < PARAM_COUNT; i++) {
+    for (uint16_t i = 0; i < system_param_count; i++) {
         if (system_params[i].flags & FLAG_MQTT_ACCESS) {
             String topic = buildTopic("set", system_params[i].name);
             mqttClient.subscribe(topic.c_str());
@@ -272,7 +272,7 @@ void MQTTModule::mqttCallback(char* topic, byte* payload, unsigned int length) {
         value += (char)payload[i];
     }
 
-    for (uint16_t i = 0; i < PARAM_COUNT; i++) {
+    for (uint16_t i = 0; i < system_param_count; i++) {
         String expectedTopic = globalMQTTModule->buildTopic(
             "set",
             system_params[i].name

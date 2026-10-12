@@ -1,3 +1,11 @@
+# Arduino Library (dev)
+
+The common code is now in `src/`, with application parameters and modules registered before startup. Install this repository as an Arduino library or build the root `FrameWork.ino` sketch from the checkout. Credentials and TLS certificates belong to each application. See [Child Projects](docs/Projects.md) and [Typed Parameters](docs/Parameters.md).
+
+Library API version: 0.2.0. Existing beta.2 remains available at its tag. The first Fermenter port uses this API; compilation/hardware validation is pending.
+
+---
+
 ESP32 Framework Core
 Overview
 ESP32 Framework Core is a modular, production-oriented embedded framework for building scalable IoT, automation, and device-control systems on ESP32 hardware.
