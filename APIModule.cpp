@@ -265,7 +265,6 @@ esp_err_t APIModule::processSet(httpd_req_t* req) {
         }
 
         if (setParamFromJSON(foundIndex, item)) {
-            storageManager.scheduleSave(foundIndex);
             success++;
         } else {
             failed++;
@@ -361,83 +360,46 @@ bool APIModule::setParamFromJSON(ParamIndex index, cJSON* item) {
 
         case TYPE_BOOL:
             if (cJSON_IsBool(item)) {
-                param.boolParam.value = cJSON_IsTrue(item);
-                return true;
+                return paramManager.setBool(index, cJSON_IsTrue(item));
             }
             break;
 
         case TYPE_UINT8:
-            if (cJSON_IsNumber(item)) {
-                param.uint8Param.value = item->valueint;
-                return true;
-            }
-            break;
-
         case TYPE_UINT16:
-            if (cJSON_IsNumber(item)) {
-                param.uint16Param.value = item->valueint;
-                return true;
-            }
-            break;
-
         case TYPE_UINT32:
-            if (cJSON_IsNumber(item)) {
-                param.uint32Param.value = item->valueint;
-                return true;
+        case TYPE_TIME_SECONDS:
+        case TYPE_COLOR_RGB:
+        case TYPE_BITMASK:
+            if (cJSON_IsNumber(item) && item->valuedouble >= 0) {
+                return paramManager.setUInt(index, (uint32_t)item->valuedouble);
             }
             break;
 
         case TYPE_INT8:
-            if (cJSON_IsNumber(item)) {
-                param.int8Param.value = item->valueint;
-                return true;
-            }
-            break;
-
         case TYPE_INT16:
-            if (cJSON_IsNumber(item)) {
-                param.int16Param.value = item->valueint;
-                return true;
-            }
-            break;
-
         case TYPE_INT32:
             if (cJSON_IsNumber(item)) {
-                param.int32Param.value = item->valueint;
-                return true;
+                return paramManager.setInt(index, (int32_t)item->valuedouble);
             }
             break;
 
         case TYPE_FLOAT:
             if (cJSON_IsNumber(item)) {
-                param.floatParam.value = item->valuedouble;
-                return true;
-            }
-            break;
-
-        case TYPE_DOUBLE:
-            if (cJSON_IsNumber(item)) {
-                param.doubleParam.value = item->valuedouble;
-                return true;
+                return paramManager.setFloat(index, (float)item->valuedouble);
             }
             break;
 
         case TYPE_STRING:
         case TYPE_PASSWORD:
+        case TYPE_IP_ADDRESS:
             if (cJSON_IsString(item)) {
-                strncpy(param.stringParam.value,
-                        item->valuestring,
-                        param.stringParam.maxLength - 1);
-
-                param.stringParam.value[param.stringParam.maxLength - 1] = '\0';
-                return true;
+                return paramManager.setString(index, item->valuestring);
             }
             break;
 
         case TYPE_ENUM:
-            if (cJSON_IsNumber(item)) {
-                param.enumParam.value = item->valueint;
-                return true;
+            if (cJSON_IsNumber(item) && item->valuedouble >= 0) {
+                return paramManager.setEnum(index, (uint8_t)item->valuedouble);
             }
             break;
 
