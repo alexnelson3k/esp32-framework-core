@@ -407,6 +407,42 @@ ConfigParam system_params[PARAM_COUNT] = {
         {.enumParam = { 2, 2, log_level_options, 4 }}
     },
 
+    [PARAM_ESPNOW_ENABLED] = {
+        "espnow_enabled",
+        "Enable ESP-NOW module",
+        TYPE_BOOL,
+        FLAG_SERIAL_ACCESS | FLAG_API_ACCESS | FLAG_SAVE_TO_FLASH,
+        TAG_NETWORK | TAG_ADVANCED,
+        {.boolParam = { false, false }}
+    },
+
+    [PARAM_ESPNOW_PEER_MAC] = {
+        "espnow_peer_mac",
+        "ESP-NOW peer MAC address",
+        TYPE_STRING,
+        FLAG_SERIAL_ACCESS | FLAG_API_ACCESS | FLAG_SAVE_TO_FLASH,
+        TAG_NETWORK | TAG_ADVANCED,
+        {.stringParam = { "FF:FF:FF:FF:FF:FF", 18, "FF:FF:FF:FF:FF:FF" }}
+    },
+
+    [PARAM_ESPNOW_CHANNEL] = {
+        "espnow_channel",
+        "ESP-NOW WiFi channel, 0 follows current channel",
+        TYPE_UINT8,
+        FLAG_SERIAL_ACCESS | FLAG_API_ACCESS | FLAG_SAVE_TO_FLASH,
+        TAG_NETWORK | TAG_ADVANCED,
+        {.uint8Param = { 0, 0, 14, 1, 0 }}
+    },
+
+    [PARAM_ESPNOW_SEND_INTERVAL_MS] = {
+        "espnow_send_interval_ms",
+        "ESP-NOW status heartbeat interval",
+        TYPE_UINT32,
+        FLAG_SERIAL_ACCESS | FLAG_API_ACCESS | FLAG_SAVE_TO_FLASH,
+        TAG_NETWORK | TAG_DIAGNOSTICS | TAG_ADVANCED,
+        {.uint32Param = { 30000, 1000, 3600000, 1000, 30000 }}
+    },
+
     [PARAM_TEMP_SETPOINT] = {
         "temp_setpoint",
         "Temperature Setpoint",
