@@ -108,11 +108,16 @@ void frameworkBegin() {
 }
 
 void frameworkLoop() {
+    unsigned long loopStart = micros();
     loggerModule.loop();
+    loggerModule.timeDebugModule("Logger", loopStart);
+
+    unsigned long timeStart = loggerModule.timeDebugStart();
     timeManager.loop();
-    unsigned long start = loggerModule.profileStart();
+    loggerModule.timeDebugModule("TimeManager", timeStart);
+
     processCoreTasks();
-    loggerModule.profileEnd("CoreTasks", start);
+    loggerModule.timeDebugLoop(loopStart);
 }
 
 void frameworkConfigureTLS(const char* cert, const char* key) {

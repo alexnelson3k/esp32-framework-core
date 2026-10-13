@@ -243,14 +243,14 @@ static ConfigParam core_params[PARAM_COUNT] = {
         .access(FLAG_SERIAL_ACCESS | FLAG_API_ACCESS).persistent()
         .tags(TAG_SYSTEM | TAG_DIAGNOSTICS).build(),
 
-    [PARAM_PROFILING_ENABLED] = boolParam("profiling_enabled")
-        .description("Enable module loop profiling")
+    [PARAM_TIME_DEBUG] = boolParam("time_debug")
+        .description("Enable module timing debug")
         .defaultValue(false)
         .access(FLAG_SERIAL_ACCESS | FLAG_API_ACCESS).persistent()
         .tags(TAG_DIAGNOSTICS | TAG_ADVANCED).build(),
 
-    [PARAM_PROFILING_WARN_THRESHOLD_US] = uint32Param("profiling_warn_threshold_us")
-        .description("Loop execution warning threshold (microseconds)")
+    [PARAM_TIME_DEBUG_WARN_THRESHOLD_US] = uint32Param("time_debug_warn_threshold_us")
+        .description("Module timing warning threshold (microseconds)")
         .defaultValue(5000).range(100, 1000000).step(100)
         .access(FLAG_SERIAL_ACCESS | FLAG_API_ACCESS).persistent()
         .tags(TAG_DIAGNOSTICS | TAG_ADVANCED).build(),

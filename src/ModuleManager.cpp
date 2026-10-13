@@ -61,10 +61,10 @@ void ModuleManager::loopModules() {
     for (BaseModule* module : modules) {
         if (module->isEnabled()) {
             LoggerModule* logger = globalLogger;
-            unsigned long start = logger ? logger->profileStart() : 0;
+            unsigned long start = logger ? logger->timeDebugStart() : 0;
             module->loop();
             if (logger) {
-                logger->profileEnd(module->getName(), start);
+                logger->timeDebugModule(module->getName(), start);
             }
         }
     }

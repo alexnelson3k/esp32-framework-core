@@ -30,6 +30,7 @@ private:
     bool validateStorageHeader();
     void saveStorageHeader();
     void resetToFactoryDefaults();
+    uint32_t calculateRegistryChecksumForNames(bool legacyTimingNames);
 
 public:
     ParamStorageManager();

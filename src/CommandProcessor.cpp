@@ -420,9 +420,9 @@ void CommandProcessor::printExtendedStatus(Stream& output) {
 
     output.println();
 
-    output.print("Profiling: ");
+    output.print("Time Debug: ");
     output.println(
-        paramManager.getBool(PARAM_PROFILING_ENABLED)
+        paramManager.getBool(PARAM_TIME_DEBUG)
         ? "ENABLED"
         : "DISABLED"
     );

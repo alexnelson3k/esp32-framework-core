@@ -24,7 +24,7 @@ LoggerModule::LoggerModule(
     : BaseModule("Logger"),
       paramManager(pm),
       timeManager(tm),
-      profilingEnabled(false) {
+      timeDebugEnabled(false) {
 
     globalLogger = this;
 }
@@ -38,8 +38,8 @@ bool LoggerModule::init() {
     initialized = true;
     enabled = true;
 
-    profilingEnabled =
-        paramManager.getBool(PARAM_PROFILING_ENABLED);
+    timeDebugEnabled =
+        paramManager.getBool(PARAM_TIME_DEBUG);
 
     log(
         LOG_INFO,
@@ -70,8 +70,8 @@ void LoggerModule::loop() {
 
     if (!enabled) return;
 
-    profilingEnabled =
-        paramManager.getBool(PARAM_PROFILING_ENABLED);
+    timeDebugEnabled =
+        paramManager.getBool(PARAM_TIME_DEBUG);
 
     // Future:
     // Syslog
@@ -155,34 +155,42 @@ void LoggerModule::logf(LogLevel level, const char* module, const char* format, 
 }
 
 // ============================================================
-// Profiling
+// Timing diagnostics
 // ============================================================
 
-unsigned long LoggerModule::profileStart() {
-    if (!profilingEnabled) return 0;
+unsigned long LoggerModule::timeDebugStart() {
+    if (!timeDebugEnabled) return 0;
     return micros();
 }
 
-void LoggerModule::profileEnd(
+void LoggerModule::timeDebugModule(
     const char* moduleName,
     unsigned long startMicros
 ) {
 
-    if (!profilingEnabled || startMicros == 0) return;
+    if (!timeDebugEnabled || startMicros == 0) return;
 
     unsigned long elapsed = micros() - startMicros;
 
     uint32_t warnThreshold =
-        paramManager.getUInt(PARAM_PROFILING_WARN_THRESHOLD_US);
+        paramManager.getUInt(PARAM_TIME_DEBUG_WARN_THRESHOLD_US);
 
     if (elapsed > warnThreshold) {
 
         logf(
             LOG_WARN,
-            "Profiler",
+            "TimeDebug",
             "%s loop execution time: %lu us",
             moduleName,
             elapsed
         );
     }
+}
+
+void LoggerModule::timeDebugLoop(unsigned long startMicros) {
+    if (!timeDebugEnabled) return;
+
+    unsigned long elapsed = micros() - startMicros;
+    // The threshold applies to modules only, never to the complete loop.
+    logf(LOG_INFO, "TimeDebug", "Total loop execution time: %lu us", elapsed);
 }

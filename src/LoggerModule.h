@@ -1,6 +1,6 @@
 // ============================================================
 // LoggerModule.h
-// Centralized logging + NTP timestamps + optional performance profiling
+// Centralized logging + NTP timestamps + optional execution timing
 // ============================================================
 
 #ifndef LOGGER_MODULE_H
@@ -32,7 +32,7 @@ class LoggerModule : public BaseModule {
 private:
     ParamManager& paramManager;
 
-    bool profilingEnabled;
+    bool timeDebugEnabled;
 
     String getTimestamp();
     const char* levelToString(LogLevel level);
@@ -50,9 +50,10 @@ public:
     void log(LogLevel level, const char* module, const String& message);
     void logf(LogLevel level, const char* module, const char* format, ...);
 
-    // Performance profiling
-    unsigned long profileStart();
-    void profileEnd(const char* moduleName, unsigned long startMicros);
+    // Timing diagnostics
+    unsigned long timeDebugStart();
+    void timeDebugModule(const char* moduleName, unsigned long startMicros);
+    void timeDebugLoop(unsigned long startMicros);
 };
 
 // ============================================================

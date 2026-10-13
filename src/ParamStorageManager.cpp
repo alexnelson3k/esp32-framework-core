@@ -23,12 +23,26 @@ ParamStorageManager::ParamStorageManager()
 // ============================================================
 
 uint32_t ParamStorageManager::calculateRegistryChecksum() {
+    return calculateRegistryChecksumForNames(false);
+}
+
+uint32_t ParamStorageManager::calculateRegistryChecksumForNames(bool legacyTimingNames) {
     CRC32 crc;
 
     for (uint16_t i = 0; i < system_param_count; i++) {
         ConfigParam& p = system_params[i];
 
-        crc.update((const uint8_t*)p.name, strlen(p.name));
+        const char* name = p.name;
+        // Accept only the previous timing names; unrelated schema changes still reset defaults.
+        if (legacyTimingNames) {
+            if (i == PARAM_TIME_DEBUG && strcmp(name, "time_debug") == 0) {
+                name = "profiling_enabled";
+            } else if (i == PARAM_TIME_DEBUG_WARN_THRESHOLD_US &&
+                       strcmp(name, "time_debug_warn_threshold_us") == 0) {
+                name = "profiling_warn_threshold_us";
+            }
+        }
+        crc.update((const uint8_t*)name, strlen(name));
         crc.update((uint8_t*)&p.type, sizeof(p.type));
         crc.update((uint8_t*)&p.flags, sizeof(p.flags));
         crc.update((uint8_t*)&p.tags, sizeof(p.tags));
@@ -63,7 +77,12 @@ bool ParamStorageManager::validateStorageHeader() {
     }
 
     if (header.registryChecksum != calculateRegistryChecksum()) {
-        return false;
+        if (header.registryChecksum != calculateRegistryChecksumForNames(true)) {
+            return false;
+        }
+        // Values use numeric keys, so their existing indexes need no migration.
+        saveStorageHeader();
+        Serial.println("[INFO][STORAGE] Timing parameter names migrated; settings preserved.");
     }
 
     return true;
