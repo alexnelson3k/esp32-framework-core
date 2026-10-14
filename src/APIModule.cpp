@@ -2,6 +2,7 @@
 
 #include "APIModule.h"
 #include "FrameworkLog.h"
+#include <cmath>
 
 extern ConfigParam* system_params;
 
@@ -179,7 +180,10 @@ esp_err_t APIModule::processConfig(httpd_req_t* req) {
                 break;
 
             case TYPE_FLOAT:
-                cJSON_AddNumberToObject(root, p.name, p.floatParam.value);
+                if (std::isfinite(p.floatParam.value))
+                    cJSON_AddNumberToObject(root, p.name, p.floatParam.value);
+                else
+                    cJSON_AddNullToObject(root, p.name);
                 break;
 
             case TYPE_DOUBLE:
@@ -436,4 +440,5 @@ esp_err_t APIModule::statusHandler(httpd_req_t* req) {
 esp_err_t APIModule::healthHandler(httpd_req_t* req) {
     return ((APIModule*)req->user_ctx)->processHealth(req);
 }
+
 
