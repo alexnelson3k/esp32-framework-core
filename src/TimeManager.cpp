@@ -3,6 +3,7 @@
 // ============================================================
 
 #include "TimeManager.h"
+#include "FrameworkLog.h"
 
 TimeManager* globalTimeManager = nullptr;
 
@@ -126,8 +127,10 @@ void TimeManager::syncTimeInternal() {
 
     if (getLocalTime(&timeinfo, NTP_SYNC_TIMEOUT_MS)) {
         timeValid = true;
+        FW_LOG_INFO("Time", "NTP time available");
     } else {
         timeValid = false;
+        FW_LOG_WARN("Time", "NTP synchronization timed out; will retry");
     }
 }
 
@@ -172,7 +175,7 @@ String TimeManager::getFormattedTime() {
 
     struct tm timeinfo;
 
-    if (!getLocalTime(&timeinfo)) {
+    if (!getLocalTime(&timeinfo, 0)) {
         return String("UPTIME:") + String(millis() / 1000);
     }
 
@@ -200,7 +203,7 @@ String TimeManager::getISOTime() {
 
     struct tm timeinfo;
 
-    if (!getLocalTime(&timeinfo)) {
+    if (!getLocalTime(&timeinfo, 0)) {
         return "";
     }
 

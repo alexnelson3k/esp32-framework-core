@@ -1,6 +1,7 @@
 // APIModule.cpp
 
 #include "APIModule.h"
+#include "FrameworkLog.h"
 
 extern ConfigParam* system_params;
 
@@ -65,7 +66,10 @@ void APIModule::loop() {
 }
 
 bool APIModule::startServer() {
-    if (!certificate || !privateKey) return false;
+    if (!certificate || !privateKey) {
+        FW_LOG_EVERY(LOG_ERROR, 30000, "API", "TLS certificate or private key missing");
+        return false;
+    }
     httpd_ssl_config_t conf = HTTPD_SSL_CONFIG_DEFAULT();
 
     conf.httpd.server_port = paramManager.getUInt(PARAM_API_PORT);
@@ -82,6 +86,7 @@ bool APIModule::startServer() {
     conf.httpd.lru_purge_enable = true;
 
     if (httpd_ssl_start(&server, &conf) != ESP_OK) {
+        FW_LOG_EVERY(LOG_ERROR, 30000, "API", "HTTPS server startup failed");
         return false;
     }
 
@@ -89,6 +94,7 @@ bool APIModule::startServer() {
     httpd_register_uri_handler(server, &set_uri);
     httpd_register_uri_handler(server, &status_uri);
     httpd_register_uri_handler(server, &healthUri);
+    FW_LOG_INFO("API", "HTTPS server started on port %u", static_cast<unsigned>(conf.httpd.server_port));
 
     return true;
 }
@@ -97,6 +103,7 @@ void APIModule::stopServer() {
     if (server) {
         httpd_ssl_stop(server);
         server = nullptr;
+        FW_LOG_INFO("API", "HTTPS server stopped");
     }
 }
 
@@ -429,3 +436,4 @@ esp_err_t APIModule::statusHandler(httpd_req_t* req) {
 esp_err_t APIModule::healthHandler(httpd_req_t* req) {
     return ((APIModule*)req->user_ctx)->processHealth(req);
 }
+

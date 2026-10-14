@@ -1,6 +1,7 @@
 // WatchdogModule.cpp
 
 #include "WatchdogModule.h"
+#include "FrameworkLog.h"
 #include <WiFi.h>
 #include <esp_system.h>
 
@@ -58,7 +59,7 @@ void WatchdogModule::checkTimeout() {
     if (millis() - lastFeedTime > timeout) {
         failureCount++;
 
-        Serial.printf("[WATCHDOG] Timeout detected (%u/%u)\n",
+        FW_LOG_WARN("Watchdog", "Timeout detected (%u/%u)",
                       failureCount,
                       paramManager.getUInt(PARAM_WATCHDOG_MAX_FAILURES));
 
@@ -71,33 +72,21 @@ void WatchdogModule::checkTimeout() {
 }
 
 void WatchdogModule::triggerRecovery() {
-    Serial.println("[WATCHDOG] Critical failure threshold reached.");
+    FW_LOG_ERROR("Watchdog", "Critical failure threshold reached");
 
     if (!paramManager.getBool(PARAM_AUTO_REBOOT_ENABLED)) {
-        Serial.println("[WATCHDOG] Auto reboot disabled.");
+        FW_LOG_WARN("Watchdog", "Auto reboot disabled");
         return;
     }
 
-    Serial.println("[WATCHDOG] Rebooting ESP...");
+    FW_LOG_ERROR("Watchdog", "Rebooting after failure threshold");
     delay(1000);
     ESP.restart();
 }
 
 void WatchdogModule::reportHealth() {
-    Serial.println("========== HEALTH REPORT ==========");
-    Serial.printf("Uptime: %lu sec\n", millis() / 1000);
-    Serial.printf("Free Heap: %u bytes\n", ESP.getFreeHeap());
-    Serial.printf("Min Free Heap: %u bytes\n", ESP.getMinFreeHeap());
-    Serial.printf("WiFi Connected: %s\n",
-                  WiFi.status() == WL_CONNECTED ? "YES" : "NO");
-
-    if (WiFi.status() == WL_CONNECTED) {
-        Serial.printf("SSID: %s\n", WiFi.SSID().c_str());
-        Serial.printf("IP: %s\n", WiFi.localIP().toString().c_str());
-        Serial.printf("RSSI: %d dBm\n", WiFi.RSSI());
-    }
-
-    Serial.printf("Failure Count: %u\n", failureCount);
-    Serial.printf("Reset Reason: %d\n", esp_reset_reason());
-    Serial.println("===================================");
+    FW_LOG_DEBUG("Health", "Uptime=%lu s heap=%u min_heap=%u WiFi=%s failures=%u reset=%d",
+                 millis() / 1000, ESP.getFreeHeap(), ESP.getMinFreeHeap(),
+                 WiFi.status() == WL_CONNECTED ? "connected" : "disconnected",
+                 failureCount, static_cast<int>(esp_reset_reason()));
 }

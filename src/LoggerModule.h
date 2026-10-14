@@ -49,6 +49,7 @@ public:
 
     void log(LogLevel level, const char* module, const String& message);
     void logf(LogLevel level, const char* module, const char* format, ...);
+    bool shouldLog(LogLevel level) const;
 
     // Timing diagnostics
     unsigned long timeDebugStart();
@@ -63,3 +64,4 @@ public:
 extern LoggerModule* globalLogger;
 
 #endif
+

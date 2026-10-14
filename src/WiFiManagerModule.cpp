@@ -1,6 +1,7 @@
 //WiFiManagerModule.cpp
 
 #include "WiFiManagerModule.h"
+#include "FrameworkLog.h"
 
 WiFiManagerModule::WiFiManagerModule(ParamManager& pm)
     : BaseModule("WiFiManager"),
@@ -18,7 +19,7 @@ bool WiFiManagerModule::init() {
         return false;
     }
     
-    Serial.println("[DEBUG] WiFiManager init called");
+    FW_LOG_DEBUG("WiFi", "STA initialization");
     WiFi.mode(WIFI_STA);
     WiFi.setAutoReconnect(true);
     WiFi.persistent(false);
@@ -63,6 +64,7 @@ void WiFiManagerModule::connectSTA() {
     WiFi.disconnect(true);
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid.c_str(), password.c_str());
+    FW_LOG_DEBUG("WiFi", "Connection attempt started");
 
     connectionInProgress = true;
     connectStartTime = millis();
@@ -78,12 +80,14 @@ void WiFiManagerModule::processConnection() {
         apMode = false;
         connectionInProgress = false;
         retryCount = 0;
+        FW_LOG_INFO("WiFi", "Connected; IP %s", WiFi.localIP().toString().c_str());
         return;
     }
 
     if (millis() - connectStartTime >= timeoutMs) {
         connectionInProgress = false;
         retryCount++;
+        FW_LOG_WARN("WiFi", "Connection timed out; retry %u", static_cast<unsigned>(retryCount));
 
         if (retryCount >= maxRetries) {
             startAP();
@@ -101,6 +105,7 @@ void WiFiManagerModule::startAP() {
 
     apMode = true;
     connectionInProgress = false;
+    FW_LOG_WARN("WiFi", "Configuration AP active; IP %s", WiFi.softAPIP().toString().c_str());
 }
 
 void WiFiManagerModule::disconnect() {

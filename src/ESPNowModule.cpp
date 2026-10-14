@@ -1,4 +1,5 @@
 #include "ESPNowModule.h"
+#include "FrameworkLog.h"
 
 #include <esp_wifi.h>
 #include <stdio.h>
@@ -34,16 +35,19 @@ bool ESPNowModule::init() {
     }
 
     if (!configureRadioChannel()) {
+        FW_LOG_EVERY(LOG_ERROR, 30000, "ESPNow", "Radio channel setup failed");
         espNowReady = false;
         return true;
     }
 
     if (esp_now_init() != ESP_OK) {
+        FW_LOG_EVERY(LOG_ERROR, 30000, "ESPNow", "Initialization failed");
         espNowReady = false;
         return true;
     }
 
     espNowReady = true;
+    FW_LOG_INFO("ESPNow", "Radio initialized");
     esp_now_register_send_cb(onSend);
     esp_now_register_recv_cb(onReceive);
 
@@ -81,6 +85,11 @@ void ESPNowModule::loop() {
     }
 
     if (!enabled || !espNowReady) return;
+    static uint32_t lastFailed = 0;
+    if (failedCount != lastFailed) {
+        lastFailed = failedCount;
+        FW_LOG_EVERY(LOG_WARN, 30000, "ESPNow", "Send failures: %lu", static_cast<unsigned long>(failedCount));
+    }
 
     if (!peerConfigured) {
         peerConfigured = configurePeer();
@@ -115,6 +124,7 @@ bool ESPNowModule::configurePeer() {
     const char* macText = paramManager.getString(PARAM_ESPNOW_PEER_MAC);
 
     if (!parseMacAddress(macText, peerMac)) {
+        FW_LOG_EVERY(LOG_WARN, 30000, "ESPNow", "Peer MAC is invalid or missing");
         return false;
     }
 
@@ -205,3 +215,4 @@ uint32_t ESPNowModule::getFailedCount() const {
 uint32_t ESPNowModule::getReceivedCount() const {
     return receivedCount;
 }
+

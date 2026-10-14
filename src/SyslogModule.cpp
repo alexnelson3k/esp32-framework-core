@@ -29,6 +29,7 @@ void SyslogModule::loop() {
 
 bool SyslogModule::isReady() {
     return enabled &&
+           paramManager.getBool(PARAM_LOG_SYSLOG_ENABLED) &&
            WiFi.status() == WL_CONNECTED &&
            strlen(paramManager.getString(PARAM_SYSLOG_SERVER)) > 0;
 }
@@ -78,3 +79,4 @@ void SyslogModule::send(LogLevel level, const char* module, const String& messag
     udp.write((const uint8_t*)packet.c_str(), packet.length());
     udp.endPacket();
 }
+

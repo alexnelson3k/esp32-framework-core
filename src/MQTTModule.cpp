@@ -2,6 +2,7 @@
 
 #include "MQTTModule.h"
 #include "Param_Types.h"
+#include "FrameworkLog.h"
 
 extern ConfigParam* system_params;
 
@@ -132,13 +133,17 @@ void MQTTModule::connectMQTT() {
 
     if (success) {
         connected = true;
+        FW_LOG_INFO("MQTT", "Broker connected");
         subscribeTopics();
     } else {
         connected = false;
+        FW_LOG_EVERY(LOG_WARN, 30000, "MQTT", "Broker connection failed; state %d", mqttClient.state());
     }
 }
 
 void MQTTModule::disconnectMQTT() {
+    if (connected)
+        FW_LOG_INFO("MQTT", "Disconnected");
     mqttClient.disconnect();
     connected = false;
 }
@@ -164,7 +169,8 @@ void MQTTModule::publishParam(ParamIndex index) {
     String topic = buildTopic("status", param.name);
     String payload = getParamDisplayValue(index);
 
-    mqttClient.publish(topic.c_str(), payload.c_str(), true);
+    if (!mqttClient.publish(topic.c_str(), payload.c_str(), true))
+        FW_LOG_EVERY(LOG_WARN, 30000, "MQTT", "Parameter publish failed: %s", param.name);
 }
 
 void MQTTModule::publishByFlag(uint16_t flag) {
@@ -279,6 +285,7 @@ void MQTTModule::mqttCallback(char* topic, byte* payload, unsigned int length) {
         );
 
         if (incomingTopic == expectedTopic) {
+            FW_LOG_DEBUG("MQTT", "Parameter update requested: %s", system_params[i].name);
 
             switch (system_params[i].type) {
 
@@ -333,3 +340,4 @@ void MQTTModule::mqttCallback(char* topic, byte* payload, unsigned int length) {
         }
     }
 }
+

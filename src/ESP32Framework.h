@@ -10,6 +10,7 @@
 #include "EventBus.h"
 #include "TimeManager.h"
 #include "LoggerModule.h"
+#include "FrameworkLog.h"
 #include "WatchdogModule.h"
 #include "WiFiManagerModule.h"
 #include "ESPNowModule.h"
@@ -32,3 +33,4 @@ void frameworkBegin();
 void frameworkLoop();
 
 #endif
+

@@ -1,6 +1,7 @@
 // TelnetModule.cpp
 
 #include "TelnetModule.h"
+#include "FrameworkLog.h"
 
 TelnetModule::TelnetModule(ParamManager& pm, CommandProcessor& cp)
     : BaseModule("Telnet"),
@@ -41,6 +42,7 @@ void TelnetModule::startServer() {
     telnetServer->setNoDelay(true);
 
     serverRunning = true;
+    FW_LOG_INFO("Telnet", "Listening on port %u", static_cast<unsigned>(currentPort));
 }
 
 void TelnetModule::stopServer() {
@@ -58,6 +60,7 @@ void TelnetModule::stopServer() {
     }
 
     serverRunning = false;
+    FW_LOG_INFO("Telnet", "Server stopped");
 }
 
 void TelnetModule::restartServerIfNeeded() {
@@ -93,12 +96,14 @@ void TelnetModule::loop() {
     if (telnetServer->hasClient()) {
         if (!telnetClient || !telnetClient.connected()) {
             telnetClient = telnetServer->available();
+            FW_LOG_INFO("Telnet", "Client connected");
             telnetClient.println("ESP32 Telnet Console Ready");
             telnetClient.print("> ");
         } else {
             WiFiClient newClient = telnetServer->available();
             newClient.println("Another client is already connected.");
             newClient.stop();
+            FW_LOG_EVERY(LOG_WARN, 30000, "Telnet", "Extra client rejected");
         }
     }
 

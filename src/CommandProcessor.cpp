@@ -1,4 +1,5 @@
 #include "CommandProcessor.h"
+#include "FrameworkLog.h"
 
 #include <WiFi.h>
 
@@ -83,11 +84,13 @@ void CommandProcessor::handleCommand(String input, Stream& output) {
     }
 
     cmd.toLowerCase();
+    FW_LOG_DEBUG("Command", "Console command received (arguments not logged)");
 
     if (processCoreCommand(cmd, arg1, arg2, output)) return;
     if (processParamCommand(cmd, arg1, arg2, output)) return;
 
     output.println("Error: Unknown command. Type 'help' for available commands.");
+    FW_LOG_EVERY(LOG_WARN, 30000, "Command", "Unknown console command");
 }
 
 bool CommandProcessor::processCoreCommand(const String& cmd, const String&, const String&, Stream& output) {
@@ -109,6 +112,7 @@ bool CommandProcessor::processCoreCommand(const String& cmd, const String&, cons
     if (cmd == "save") {
         storageManager.saveAll();
         output.println("Configuration saved.");
+        FW_LOG_INFO("Command", "Configuration save requested");
         return true;
     }
 
@@ -116,11 +120,13 @@ bool CommandProcessor::processCoreCommand(const String& cmd, const String&, cons
         storageManager.factoryReset();
         storageManager.saveAll();
         output.println("Factory defaults restored.");
+        FW_LOG_WARN("Command", "Factory defaults restored by command");
         return true;
     }
 
     if (cmd == "reboot") {
         output.println("Rebooting...");
+        FW_LOG_WARN("Command", "Reboot requested by command");
         delay(1000);
         ESP.restart();
         return true;
@@ -429,3 +435,4 @@ void CommandProcessor::printExtendedStatus(Stream& output) {
 
     output.println("===================================");
 }
+

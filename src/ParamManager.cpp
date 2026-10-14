@@ -1,10 +1,12 @@
 #include "ParamManager.h"
 #include <cstring>
+#include "FrameworkLog.h"
 
 ParamManager::ParamManager(ParamStorageManager& storage)
     : storageManager(storage) {}
 
 bool ParamManager::init() {
+    FW_LOG_DEBUG("Parameters", "Parameter manager initialization");
     return storageManager.init();
 }
 
@@ -259,3 +261,4 @@ int32_t ParamManager::getInt(ParamIndex index) {
             return 0;
     }
 }
+

@@ -5,6 +5,7 @@
 #include "ParamStorageManager.h"
 #include "Param_Types.h"
 #include <CRC32.h>
+#include "FrameworkLog.h"
 
 extern ConfigParam* system_params;
 
@@ -82,7 +83,7 @@ bool ParamStorageManager::validateStorageHeader() {
         }
         // Values use numeric keys, so their existing indexes need no migration.
         saveStorageHeader();
-        Serial.println("[INFO][STORAGE] Timing parameter names migrated; settings preserved.");
+        FW_LOG_INFO("Storage", "Timing parameter names migrated; settings preserved");
     }
 
     return true;
@@ -187,24 +188,25 @@ bool ParamStorageManager::init() {
     sealParameterRegistry();
     dirtyFlags.resize(system_param_count, 0);
     if (!preferences.begin("params", false)) {
+        FW_LOG_ERROR("Storage", "Cannot open NVS namespace");
         return false;
     }
 
     if (!validateStorageHeader()) {
 
-    Serial.println("[WARNING][STORAGE] Registry mismatch detected.");
-    Serial.println("[WARNING][STORAGE] Restoring factory defaults...");
+    FW_LOG_WARN("Storage", "Registry missing or mismatched; restoring factory defaults");
     
     resetToFactoryDefaults();
     saveAll();
     saveStorageHeader();
 
-    Serial.println("[WARNING][STORAGE] Rebooting system...");
+    FW_LOG_WARN("Storage", "Rebooting after registry reset");
     
     delay(2000);
     ESP.restart();
     } else {
         loadAll();
+        FW_LOG_INFO("Storage", "Saved settings loaded");
     }
 
     return true;
@@ -216,6 +218,8 @@ bool ParamStorageManager::init() {
 
 void ParamStorageManager::scheduleSave(ParamIndex index) {
     if (index < system_param_count) {
+        if (!dirtyFlags[index])
+            FW_LOG_DEBUG("Storage", "Save scheduled for parameter: %s", system_params[index].name);
         dirtyFlags[index] = true;
     }
 }
@@ -425,3 +429,4 @@ void ParamStorageManager::factoryReset() {
     saveAll();
     saveStorageHeader();
 }
+

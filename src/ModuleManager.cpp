@@ -1,5 +1,6 @@
 #include "ModuleManager.h"
 #include "LoggerModule.h"
+#include "FrameworkLog.h"
 
 ModuleManager::ModuleManager() {}
 
@@ -7,6 +8,7 @@ bool ModuleManager::registerModule(BaseModule* module) {
     if (!module) return false;
 
     modules.push_back(module);
+    FW_LOG_DEBUG("Modules", "Registered: %s", module->getName());
     return true;
 }
 
@@ -27,14 +29,17 @@ BaseModule* ModuleManager::getModule(const char* moduleName) {
 bool ModuleManager::initModules() {
     for (BaseModule* module : modules) {
         if (!module->checkDependencies()) {
+            FW_LOG_WARN("Modules", "Dependencies unavailable: %s", module->getName());
             continue;
         }
 
         if (!module->init()) {
+            FW_LOG_ERROR("Modules", "Initialization failed: %s", module->getName());
             return false;
         }
 
         module->setEnabled(true);
+        FW_LOG_INFO("Modules", "Initialized: %s", module->getName());
     }
 
     return true;
@@ -44,6 +49,7 @@ void ModuleManager::startModules() {
     for (BaseModule* module : modules) {
         if (module->isEnabled()) {
             module->start();
+            FW_LOG_DEBUG("Modules", "Start requested: %s", module->getName());
         }
     }
 }
@@ -53,6 +59,7 @@ void ModuleManager::stopModules() {
         if (module->isEnabled()) {
             module->stop();
             module->setEnabled(false);
+            FW_LOG_INFO("Modules", "Stopped: %s", module->getName());
         }
     }
 }
@@ -71,6 +78,7 @@ void ModuleManager::loopModules() {
 }
 
 bool ModuleManager::enableModule(const char* moduleName) {
+    FW_LOG_INFO("Modules", "Enable requested: %s", moduleName);
     BaseModule* module = findModule(moduleName);
     if (!module) return false;
 
@@ -87,6 +95,7 @@ bool ModuleManager::enableModule(const char* moduleName) {
 }
 
 bool ModuleManager::disableModule(const char* moduleName) {
+    FW_LOG_INFO("Modules", "Disable requested: %s", moduleName);
     BaseModule* module = findModule(moduleName);
     if (!module) return false;
 
@@ -99,6 +108,7 @@ bool ModuleManager::disableModule(const char* moduleName) {
 }
 
 bool ModuleManager::restartModule(const char* moduleName) {
+    FW_LOG_INFO("Modules", "Restart requested: %s", moduleName);
     BaseModule* module = findModule(moduleName);
     if (!module) return false;
 
@@ -133,3 +143,4 @@ void ModuleManager::listModules(Stream& output) {
         output.println(module->isEnabled() ? "YES" : "NO");
     }
 }
+

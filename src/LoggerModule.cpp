@@ -112,9 +112,7 @@ const char* LoggerModule::levelToString(LogLevel level) {
 
 void LoggerModule::log(LogLevel level, const char* module, const String& message) {
 
-    uint8_t configuredLevel = paramManager.getUInt(PARAM_LOG_LEVEL);
-
-    if (level > configuredLevel) return;
+    if (!shouldLog(level)) return;
 
     String output =
         "[" + getTimestamp() + "]" +
@@ -144,6 +142,7 @@ void LoggerModule::log(LogLevel level, const char* module, const String& message
 // ============================================================
 
 void LoggerModule::logf(LogLevel level, const char* module, const char* format, ...) {
+    if (!shouldLog(level)) return;
     char buffer[256];
 
     va_list args;
@@ -152,6 +151,10 @@ void LoggerModule::logf(LogLevel level, const char* module, const char* format, 
     va_end(args);
 
     log(level, module, String(buffer));
+}
+
+bool LoggerModule::shouldLog(LogLevel level) const {
+    return level <= paramManager.getUInt(PARAM_LOG_LEVEL);
 }
 
 // ============================================================
@@ -194,3 +197,4 @@ void LoggerModule::timeDebugLoop(unsigned long startMicros) {
     // The threshold applies to modules only, never to the complete loop.
     logf(LOG_INFO, "TimeDebug", "Total loop execution time: %lu us", elapsed);
 }
+
